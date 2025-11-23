@@ -1,0 +1,100 @@
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
+
+#define MQ A0
+#define LED_GREEN 2
+#define LED_YELLOW 3
+#define LED_RED 4
+#define LED_BLUE 5   
+#define BUZZER 6
+#define FAN_LED 7     
+
+int gasLevel = 0;   
+bool fanStatus = false;  
+
+void setup() {
+  pinMode(MQ, INPUT);
+  pinMode(LED_GREEN, OUTPUT);
+  pinMode(LED_YELLOW, OUTPUT);
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_BLUE, OUTPUT);
+  pinMode(FAN_LED, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
+
+  digitalWrite(LED_BLUE, HIGH);
+  digitalWrite(FAN_LED, LOW);
+  fanStatus = false;
+
+  lcd.begin(16, 2);
+  lcd.print("Gas & Fan System");
+  delay(2000);
+  lcd.clear();
+}
+
+void loop() {
+  gasLevel = analogRead(MQ);
+
+  lcd.setCursor(0, 0);
+  lcd.print("Gas:");
+  lcd.print(gasLevel);
+  lcd.print("  ");
+
+  lcd.setCursor(10, 0);
+  lcd.print("Fan:");
+  if (fanStatus) {
+    lcd.print("ON ");
+  } else {
+    lcd.print("OFF");
+  }
+
+
+  if (gasLevel < 400) {
+   
+    digitalWrite(LED_GREEN, HIGH);
+    digitalWrite(LED_YELLOW, LOW);
+    digitalWrite(LED_RED, LOW);
+    digitalWrite(LED_BLUE, HIGH);
+    digitalWrite(FAN_LED, LOW);
+    digitalWrite(BUZZER, LOW);
+    fanStatus = false;
+
+    lcd.setCursor(0, 1);
+    lcd.print("Status: Safe    ");
+  }
+
+  else if (gasLevel >= 400 && gasLevel < 600) {
+   
+    digitalWrite(LED_GREEN, LOW);
+    digitalWrite(LED_YELLOW, HIGH);
+    digitalWrite(LED_RED, LOW);
+    digitalWrite(LED_BLUE, HIGH);
+    digitalWrite(FAN_LED, LOW);
+    digitalWrite(BUZZER, LOW);
+    fanStatus = false;
+
+    lcd.setCursor(0, 1);
+    lcd.print("Status: Medium  ");
+  }
+
+  else {
+   
+    digitalWrite(LED_GREEN, LOW);
+    digitalWrite(LED_YELLOW, LOW);
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_BLUE, LOW);   
+    digitalWrite(FAN_LED, HIGH);    
+    fanStatus = true;
+
+    
+    digitalWrite(BUZZER, HIGH);
+    delay(1000);
+    digitalWrite(BUZZER, LOW);
+    delay(1000);
+
+    lcd.setCursor(0, 1);
+    lcd.print("DANGER! Fan ON  ");
+  }
+
+  delay(1000);
+}
