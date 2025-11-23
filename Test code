@@ -1,0 +1,49 @@
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+
+const int gasSensorPin = A0;
+
+const int LOW_LEVEL = 200;
+const int MED_LEVEL = 400;
+const int HIGH_LEVEL = 600;
+
+void setup() {
+  lcd.begin(16, 2); 
+  lcd.setCursor(0, 0);
+  lcd.print("Gas Detector");
+  delay(2000);
+  lcd.clear();
+}
+
+void loop() {
+  int sensorValue = analogRead(gasSensorPin); 
+
+  float percentage = map(sensorValue, 0, 1023, 0, 100); 
+
+  lcd.clear();
+
+  if (sensorValue < LOW_LEVEL) {
+    lcd.setCursor(0, 0);
+    lcd.print("Gas: 0%");
+    lcd.setCursor(0, 1);
+    lcd.print("Level: Safe");
+  } else {
+    lcd.setCursor(0, 0);
+    lcd.print("Gas: ");
+    lcd.print(percentage);
+    lcd.print("%");
+
+    lcd.setCursor(0, 1);
+    if (sensorValue < MED_LEVEL) {
+      lcd.print("Level: LOW");
+    } else if (sensorValue < HIGH_LEVEL) {
+      lcd.print("Level: MED");
+    } else {
+      lcd.print("Level: HIGH");
+    }
+  }
+
+  delay(1000); 
+}
